@@ -1,0 +1,140 @@
+const Customer = require("../model/Customer");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// Helper function to generate JWT token
+const generateToken = (userId, role) => {
+  return jwt.sign({ userId, role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+};
+
+// Register a new customer
+const register = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the email already exists
+    const existingCustomer = await Customer.findOne({ where: { email } });
+    if (existingCustomer) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new customer with default role "customer"
+    const customer = await Customer.create({ email, password: hashedPassword, role: "customer" });
+
+    // Generate a JWT token
+    const token = generateToken(customer.id, customer.role);
+
+    res.status(201).json({ message: "Customer registered successfully", token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Login a customer
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Find the customer by email
+    const customer = await Customer.findOne({ where: { email } });
+    if (!customer) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, customer.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Generate a JWT token
+    const token = generateToken(customer.id, customer.role);
+
+    res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all customers (for admin only)
+const findAll = async (req, res) => {
+  try {
+    const customers = await Customer.findAll();
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get a customer by ID (for admin and customer)
+const findById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findByPk(id);
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.status(200).json(customer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a customer by ID (for admin only)
+const deleteById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findByPk(id);
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    await customer.destroy();
+    res.status(200).json({ message: "Customer deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update a customer's email or password (for admin and customer)
+const update = async (req, res) => {
+  const { id } = req.params;
+  const { email, password } = req.body;
+
+  try {
+    const customer = await Customer.findByPk(id);
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    // Update email if provided
+    if (email) {
+      customer.email = email;
+    }
+
+    // Update password if provided
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      customer.password = hashedPassword;
+    }
+
+    await customer.save();
+    res.status(200).json({ message: "Customer updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login, findAll, findById, deleteById, update };
