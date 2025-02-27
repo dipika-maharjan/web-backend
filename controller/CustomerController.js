@@ -9,7 +9,7 @@ const generateToken = (userId, role) => {
 
 // Register a new customer
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { full_name, email, contact_number, password } = req.body;
 
   try {
     // Check if the email already exists
@@ -21,11 +21,16 @@ const register = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new customer with default role "customer"
-    const customer = await Customer.create({ email, password: hashedPassword, role: "customer" });
+    // Create a new customer with full_name and contact_number
+    const customer = await Customer.create({
+      full_name,
+      email,
+      contact_number,
+      password: hashedPassword
+    });
 
     // Generate a JWT token
-    const token = generateToken(customer.id, customer.role);
+    const token = generateToken(customer.id, "customer");
 
     res.status(201).json({ message: "Customer registered successfully", token });
   } catch (error) {
@@ -33,6 +38,7 @@ const register = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Login a customer
 const login = async (req, res) => {
@@ -64,13 +70,16 @@ const login = async (req, res) => {
 // Get all customers (for admin only)
 const findAll = async (req, res) => {
   try {
-    const customers = await Customer.findAll();
+    const customers = await Customer.findAll({
+      attributes: ['id', 'full_name', 'email', 'contact_number'] // Include full_name and contact_number
+    });
     res.status(200).json(customers);
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching customers:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Get a customer by ID (for admin and customer)
 const findById = async (req, res) => {
