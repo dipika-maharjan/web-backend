@@ -9,22 +9,6 @@ const Booking = sequelize.define("Booking", {
         primaryKey: true,
         autoIncrement: true
     },
-    customerId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Customer,
-            key: "id"
-        }
-    },
-    designId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Design,
-            key: "id"
-        }
-    },
     full_name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -62,8 +46,5 @@ const Booking = sequelize.define("Booking", {
     }
 }, { timestamps: true });
 
-// Define associations
-Booking.belongsTo(Customer, { foreignKey: "customerId" });
-Booking.belongsTo(Design, { foreignKey: "designId" });
 
 module.exports = Booking;

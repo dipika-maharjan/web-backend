@@ -6,11 +6,11 @@ const router = express.Router();
 
 // 🔒 Admin Routes (Protected)
 router.get("/view_bookings", findAll); 
-router.put("/bookings/:id",BookingValidation, update);
+router.put("/bookings/:id", update);
 router.delete("/bookings/:id", deleteById);
 
 // 🔓 Customer Routes (Protected but open to all users)
-router.post("/create_bookings",BookingValidation, save);  // Use consistent naming
+router.post("/create_bookings", save);  // Use consistent naming
 router.get("/:id", findById); // This must be last to avoid conflicts
 
 module.exports = router;
