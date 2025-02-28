@@ -14,6 +14,14 @@ const Design = sequelize.define("Design", {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    room: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    style: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 });
 
 module.exports = Design;

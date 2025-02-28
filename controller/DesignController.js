@@ -4,7 +4,7 @@ const Design = require("../model/Design");
 const findAll = async (req, res) => {
     try {
         const designs = await Design.findAll({
-            attributes: ['id', 'title', 'description', 'image'] // Explicitly include `id`
+            attributes: ['id', 'title', 'description', 'room', 'style', 'image'] // Include `room` and `style`
         });
         console.log("Fetched designs:", JSON.stringify(designs, null, 2)); // Debugging line
         res.status(200).json(designs);
@@ -19,7 +19,7 @@ const save = async (req, res) => {
         console.log("Request Body:", req.body); // Debugging
         console.log("Uploaded File:", req.file); // Debugging
 
-        const { title, description } = req.body;
+        const { title, description, room, style } = req.body; // Include `room` and `style`
         if (!req.file) {
             console.error("Image file is missing!");
             return res.status(400).json({ message: "Image file is required." });
@@ -28,7 +28,7 @@ const save = async (req, res) => {
         const image = req.file.filename;
 
         // Save to database
-        const newDesign = await Design.create({ title, description, image });
+        const newDesign = await Design.create({ title, description, room, style, image });
 
         res.status(201).json({ message: "Design created successfully", data: newDesign });
     } catch (error) {
@@ -76,8 +76,8 @@ const update = async (req, res) => {
             return res.status(404).json({ message: "Design not found" });
         }
 
-        const { title, description } = req.body;
-        const updatedData = { title, description };
+        const { title, description, room, style } = req.body; // Include `room` and `style`
+        const updatedData = { title, description, room, style };
 
         if (req.file) {
             updatedData.image = req.file.filename;
