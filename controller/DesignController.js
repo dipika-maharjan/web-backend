@@ -37,10 +37,6 @@ const save = async (req, res) => {
     }
 };
 
-
-
-
-
 // Get design by ID
 const findById = async (req, res) => {
     try {

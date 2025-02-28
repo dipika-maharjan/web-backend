@@ -158,5 +158,18 @@ const update = async (req, res) => {
   }
 };
 
+// Get the profile of the authenticated customer
+const getProfile = async (req, res) => {
+  try {
+    const customer = await Customer.findByPk(req.user.userId);  // Use Sequelize findByPk
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+    res.json(customer);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-module.exports = { register, login, findAll, findById, deleteById, update };
+module.exports = { register, login, findAll, findById, deleteById, update, getProfile };
