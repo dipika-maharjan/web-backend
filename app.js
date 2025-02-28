@@ -26,6 +26,8 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));  // Add this for form data
+
 app.use("/api/customer", CustomerRouter);
 app.use("/api/design", DesignRouter);
 app.use("/design_images", express.static("design_images"));

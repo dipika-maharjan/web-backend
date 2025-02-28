@@ -119,7 +119,7 @@ const deleteById = async (req, res) => {
 // Update a customer's email or password (for admin and customer)
 const update = async (req, res) => {
   const { id } = req.params;
-  const { email, password } = req.body;
+  const { email, password, full_name, contact_number } = req.body;
 
   try {
     const customer = await Customer.findByPk(id);
@@ -127,23 +127,36 @@ const update = async (req, res) => {
       return res.status(404).json({ message: "Customer not found" });
     }
 
-    // Update email if provided
+    // Check if email is already in use
     if (email) {
+      const existingCustomer = await Customer.findOne({ where: { email } });
+      if (existingCustomer && existingCustomer.id !== customer.id) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
       customer.email = email;
     }
 
-    // Update password if provided
-    if (password) {
+    // Update full name and contact number
+    if (full_name) {
+      customer.full_name = full_name;
+    }
+    if (contact_number) {
+      customer.contact_number = contact_number;
+    }
+
+    // Hash password if updated
+    if (password && password.trim() !== "") {
       const hashedPassword = await bcrypt.hash(password, 10);
       customer.password = hashedPassword;
     }
 
     await customer.save();
-    res.status(200).json({ message: "Customer updated successfully" });
+    res.status(200).json({ message: "Customer updated successfully", customer });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = { register, login, findAll, findById, deleteById, update };

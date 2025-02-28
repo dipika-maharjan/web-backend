@@ -16,27 +16,30 @@ const findAll = async (req, res) => {
 // Save a new design
 const save = async (req, res) => {
     try {
+        console.log("Request Body:", req.body); // Debugging
+        console.log("Uploaded File:", req.file); // Debugging
+
         const { title, description } = req.body;
-
-        // Log the body and file to inspect the incoming data
-        console.log('Request Body:', req.body);
-        console.log('Uploaded File:', req.file);
-
-        if (!title || !description || !req.file) {
-            return res.status(400).json({ message: "Title, description, and image are required" });
+        if (!req.file) {
+            console.error("Image file is missing!");
+            return res.status(400).json({ message: "Image file is required." });
         }
 
-        const design = await Design.create({
-            title,
-            description,
-            image: req.file.filename, // Saves only filename
-        });
+        const image = req.file.filename;
 
-        res.status(201).json(design);
-    } catch (err) {
-        res.status(500).json({ message: "Error saving design", error: err.message });
+        // Save to database
+        const newDesign = await Design.create({ title, description, image });
+
+        res.status(201).json({ message: "Design created successfully", data: newDesign });
+    } catch (error) {
+        console.error("Error creating design:", error);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 };
+
+
+
+
 
 // Get design by ID
 const findById = async (req, res) => {
