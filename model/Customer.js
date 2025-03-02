@@ -28,8 +28,8 @@ const Customer = sequelize.define("Customer", {
     allowNull: false,
   }
 }, {
-  tableName: "Customers",  // ✅ This forces Sequelize to use the correct table name
-  timestamps: false, // Optional: Disable createdAt and updatedAt if not needed
+  tableName: "Customers", 
+  timestamps: false, 
 });
 
 module.exports = Customer;
