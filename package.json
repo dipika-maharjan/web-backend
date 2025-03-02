@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm app.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -24,5 +24,10 @@
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "sequelize-mock": "^0.10.2",
+    "supertest": "^7.0.0"
   }
 }

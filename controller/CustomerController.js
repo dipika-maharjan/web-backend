@@ -161,10 +161,15 @@ const update = async (req, res) => {
 // Get the profile of the authenticated customer
 const getProfile = async (req, res) => {
   try {
-    const customer = await Customer.findByPk(req.user.userId);  // Use Sequelize findByPk
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+    }
+
+    const customer = await Customer.findByPk(req.user.userId);
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
     }
+
     res.json(customer);
   } catch (error) {
     console.error("Error fetching profile:", error);

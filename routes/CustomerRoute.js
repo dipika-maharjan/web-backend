@@ -9,7 +9,7 @@ router.post("/login", login);
 
 // Protected routes
 router.get("/view_customers", findAll); // Admin only
-router.get("/profile", authenticateToken, getProfile); // Accessible to authenticated customers
+router.get("/profile", getProfile); // Accessible to authenticated customers
 router.get("/:id", findById); // Accessible to both admin and customer
 router.delete("/:id",  deleteById); // Admin only
 router.put("/:id", update); // Accessible to both admin and customer
